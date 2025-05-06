@@ -18,7 +18,7 @@ class NetworkTopology(Topo):
         self.addLink(h1, s1)
         self.addLink(h2, s1)
         self.addLink(s1, s2)
-        self.addLinks(attacker, s1)
+        self.addLink(attacker, s1)
 
 
 

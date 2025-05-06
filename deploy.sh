@@ -7,23 +7,6 @@ SNORT_CONF="/etc/snort/snort.conf"
 INCLUDE_LINE="include \$RULE_PATH/$RULES_FILE"
 DISABLE_LINE="include \$RULE_PATH/icmp-info.rules"
 
-# === Copy custom Snort rules ===
-echo "[*] Installing custom Snort rules..."
-sudo cp "$RULES_FILE" "$RULES_DEST"
-
-# === Add custom include line if not already present ===
-echo "[*] Checking if custom rule is already included in snort.conf..."
-if ! grep -Fxq "$INCLUDE_LINE" "$SNORT_CONF"; then
-    echo "[*] Adding custom rule include to snort.conf..."
-    echo "$INCLUDE_LINE" | sudo tee -a "$SNORT_CONF"
-else
-    echo "[*] Custom rule already included. Skipping."
-fi
-
-# === Comment out icmp-info.rules if enabled ===
-echo "[*] Disabling icmp-info.rules in snort.conf if present..."
-sudo sed -i "/^$DISABLE_LINE/ s/^/#/" "$SNORT_CONF"
-
 # Deploys the RYU controller in a new terminal for ubuntu
 gnome-terminal -- bash -c "ryu-manager ryu_controller.py; exec bash"
 

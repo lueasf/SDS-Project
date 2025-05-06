@@ -3,7 +3,7 @@ from mininet.topo import Topo
 
 class NetworkTopology(Topo):
     def __init__(self):
-        Topo.___init__(self) # Init topology
+        Topo.__init__(self) # Init topology
 
         # Add hosts 
         h1 = self.addHost('h1')

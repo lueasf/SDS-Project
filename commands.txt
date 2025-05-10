@@ -3,11 +3,32 @@ export LANG=en_US.UTF-8
 
 # test 
 sh deploy.sh
+pingall
+-> 0% dropped
 
 ######### ATTACKS #########
 # port scanning
+attacker nmap -p 1-450 10.0.0.1
 attacker nmap -p 80,443 10.0.0.1
-
+# then in the term, we could imagine h1, want to see if someone scan their ports, so we want to detect these attacks:
+xterm h1 attacker
+# in h1 , we look for the number of SYN packets received :
+tcpdump -nn -i h1-eth0 'tcp[tcpflags] & tcp-syn != 0'
+# in attacker, launch port scanning :
+attacker nmap -p 80,443 10.0.0.1
+# in h1, we can see : 
+# at time x, ip of 10.0.0.3 (attacker) sent packets to port 80, and port 80 aswered, same with 443. (SYN-ACK)
+# Now, not only h1 want to detect, but also mitigate/prevent attacks form attacker
+# in h1, we can block all the TCP trafic from attacker to h1 for any ports:
+iptables -A INPUT -s 10.0.0.3 -p tcp --dport 1:65535 -j DROP
+iptables -L INPUT -nv
+# now in attacker, we cant nmap, ports are filtered.
+# we can also uses SDN strenghts like dynamic flow rules and inject flow-mods in mininet:
+# deploy again, pingall, test nmap, it works, add rule : 
+mininet > sh ovs-ofctl add-flow s1 "priority=200,ip,nw_src=10.0.0.3,action=drop"
+# inject a rule OpenFlow in the s1 switch to block, with high priority to be looked at first
+# indeed, without the high priority, s1 could send the unknowned packets to Ryu (controler), which could lead to a table miss.
+# nmap again, does not work !
 
 # ARP Spoofing
 # mislead the host into thinking that the attacker is the other host.
@@ -55,12 +76,14 @@ curl http://10.0.0.1:81/index.html
 # in mininet :
 xterm h1 h2 attacker attacker
 # in h1
+tc qdisc add dev h1-eth0 root tbf rate 10mbit burst 32k latency 400ms
 cd /tmp
+dd if=/dev/zero of=/tmp/big.bin bs=1G count=1
 python3 -m http.server 81 &
 # in h2, we look at the mean time
 ping -c5 10.0.0.1 
 # or ping -c 0.2 10.0.0.1 for a short time
-time curl -o /dev/null http://10.0.0.1:81/index.html
+time curl -o /dev/null http://10.0.0.1:81/big.bin
 # in attacker(1)
 sysctl -w net.ipv4.ip_forward=1
 arpspoof -i attacker-eth0 -t 10.0.0.1 10.0.0.2 &
@@ -68,6 +91,15 @@ arpspoof -i attacker-eth0 -t 10.0.0.1 10.0.0.2 &
 python3 table_miss.py
 # in h2, we look at the mean time again but with the attack ongoing
 ping -c5 10.0.0.1 
-time curl -o /dev/null http://10.0.0.1:81/index.html
+time curl -o /dev/null http://10.0.0.1:81/big.bi,
 # we compare the mean time and conclude that the attack is successful
 # if the results are not that different, we can try downloading a bigger file in h2.
+
+# how to detect AND prevent the table-miss:
+# sets timeouts for flow-entries:
+mininet> sh ovs-ofctl add-flows s1 \ "priority=100,ip,actions=NORMAL,idle_timeout=10"
+# therefore, if a rule is not used in 10s, it disapear, to avoid saturating the TCAM (memory).
+# rate-limit or drop unknow packets when too many table misses are detected:
+mininet> sh ovs-ofctl add-meter s1 \ meter=1,kbps,band=type=drop,rate=100
+mininet> sh ovs-ofctl add-flow s1 \ "priority=200,ip,actions=meter:1,normal"
+# this create a meter, which will drop ALL unknowned packets when 100 kb/s of packets is matched.

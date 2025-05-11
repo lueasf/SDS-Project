@@ -7,6 +7,18 @@ pingall
 -> 0% dropped
 
 ######### ATTACKS #########
+# DDOS
+# launch sh deploy.sh and in mininet :
+attacker ping -f 10.0.0.1
+# we can see when we control c, 0.05% packets loss, however :
+# if we launch : sh deploy_ddossh and we do the same command :
+# in mininet :
+attacker ping -f 10.0.0.1
+# then, we see "DROP IP", "API prediction : attack"
+# indeed, in the ryu_controller_ddos.py, called by deploy_ddos.sh,
+# we call an api which uses an ML model to predict if the traffic is an attack or not.
+# In this case, we can see more than 80% of packets are dropped. Which is great.
+
 # port scanning
 attacker nmap -p 1-450 10.0.0.1
 attacker nmap -p 80,443 10.0.0.1

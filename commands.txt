@@ -25,10 +25,12 @@ iptables -L INPUT -nv
 # now in attacker, we cant nmap, ports are filtered.
 # we can also uses SDN strenghts like dynamic flow rules and inject flow-mods in mininet:
 # deploy again, pingall, test nmap, it works, add rule : 
-mininet > sh ovs-ofctl add-flow s1 "priority=200,ip,nw_src=10.0.0.3,action=drop"
+mininet> sh ovs-ofctl add-flow s1 "priority=200,ip,nw_src=10.0.0.3,action=drop"
 # inject a rule OpenFlow in the s1 switch to block, with high priority to be looked at first
 # indeed, without the high priority, s1 could send the unknowned packets to Ryu (controler), which could lead to a table miss.
 # nmap again, does not work !
+# if we want to delete the rules : 
+mininet> sh ovs-ofctl del-flows s1 "ip,nw_src=10.0.0.3"
 
 # ARP Spoofing
 # mislead the host into thinking that the attacker is the other host.

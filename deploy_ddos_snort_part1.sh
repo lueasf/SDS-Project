@@ -5,7 +5,7 @@ sudo ip link add name s1-snort type dummy
 sudo ip link set s1-snort up
 
 # clean
-gnome-terminal -- bash -c "sudo mn -c"
+gnome-terminal -- bash -c "sudo mn -c; ; exec bash"
 
 # launch topology and servers
 sudo python2 network_topology.py

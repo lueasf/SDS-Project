@@ -8,7 +8,9 @@ sudo ip link set s1-snort up
 gnome-terminal -- bash -c "sudo mn -c; exec bash" &
 
 # launch topology and servers
-sudo python2 network_topology.py
+sudo python2 network_topology.py &
+
+sleep 5
 
 # adds the s1-snort link to switch s1
 # need to check port if s1-snort is the same as in ryu_controller_ddos_snort.py!

@@ -4,7 +4,7 @@
 sudo mn -c
 
 # launch ryu controller
-ryu-manager ryu_controller.py --observe-links &
+ryu-manager ryu_controller_telegraf.py --observe-links &
 
 # Sleep so RYU controller have time to start
 sleep 2

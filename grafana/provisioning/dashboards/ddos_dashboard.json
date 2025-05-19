@@ -9,6 +9,7 @@
         "datasource": "InfluxDB",
         "targets": [
           {
+            "rawQuery": true,
             "query": "SELECT mean(\"rx-pkts\") FROM \"ports\" WHERE $timeFilter GROUP BY time($__interval), \"port\" fill(null)",
             "refId": "A"
           }

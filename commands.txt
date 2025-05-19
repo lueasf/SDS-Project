@@ -19,6 +19,39 @@ attacker ping -f 10.0.0.1
 # we call an api which uses an ML model to predict if the traffic is an attack or not.
 # In this case, we can see more than 80% of packets are dropped. Which is great.
 
+# DDOS but WITH snort
+# Do these two steps if not already done
+# In t1 (new): replace snort.conf with the one in SDS project, (pwd/snort.conf is the path when in the SDS project directory)
+pwd
+sudo cp /path/to/your/snort.conf /etc/snort/snort.conf
+# In t1: copy Myrules.rules file to /etc/snort/rules/
+sudo cp /path/to/your/Myrules.rules /etc/snort/rules/
+--------------
+# In t1: clean mininet
+sudo mn -c
+# In t2 (new): add new link for snort, link deletion is skipped if it does not exist
+sudo ip link delete s1-snort type dummy 2>/dev/null || true
+sudo ip link add name s1-snort type dummy
+sudo ip link set s1-snort up
+# In t1: launch topology and servers
+sudo python2 network_topology.py
+# In t2: show s1-snort link port and check if the port matches self.snort_port variable in ryu_controller_ddos_snort.py
+sudo ovs-vsctl add-port s1 s1-snort 
+sudo ovs-ofctl show s1
+# In t3 (new): launch ryu controller
+#cd to SDS-Project/ first!
+sudo ryu-manager ryu_controller_ddos_snort.py --observe-links
+# In t4 (new): launch snort
+sudo snort -i s1-snort -A unsock -l /tmp -c /etc/snort/snort.conf
+# In t1: in mininet ping h1 from attacker to test
+attacker ping -c4 h1
+# In t1: in mininet launch terminal for attacker
+xterm attacker
+# In attacker 1: do nmap scan of h1
+nmap 10.0.0.1
+# In attacker 1: start the DDOS
+python3 dos.py 10.0.0.1
+
 # port scanning
 attacker nmap -p 1-450 10.0.0.1
 attacker nmap -p 80,443 10.0.0.1

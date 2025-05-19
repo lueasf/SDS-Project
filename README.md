@@ -1,6 +1,10 @@
 # SDS-Project
 
- 	
+
+##
+
+## Requirements
+
 1) The project NEED TO include:
 
 a) A clear network scenario, with the hosts / servers / switches / IDS, etc

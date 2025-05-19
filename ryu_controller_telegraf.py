@@ -54,7 +54,7 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
     def _flow_stats_reply_handler(self, ev):
         FLOW_MSG = "flows,datapath=%x in-port=%x,eth-dst=\"%s\",out-port=%x,packets=%d,bytes=%d %d"
         body = ev.msg.body
-        self.logger.info('stats received: %016x', ev.msg.datapath.id)
+        #self.logger.info('stats received: %016x', ev.msg.datapath.id)
 
         for stat in sorted([flow for flow in body if flow.priority == 1],
                            key=lambda flow: (flow.match['in_port'],
@@ -65,7 +65,7 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
                              stat.instructions[0].actions[0].port,
                              stat.packet_count, stat.byte_count,
                              timestamp)
-            self.logger.info(msg)
+            #self.logger.info(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
 
@@ -73,7 +73,7 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
     def _port_stats_reply_handler(self, ev):
         PORT_MSG = "ports,datapath=%x,port=%x rx-pkts=%d,rx-bytes=%d,rx-error=%d,tx-pkts=%d,tx-bytes=%d,tx-error=%d %d"
         body = ev.msg.body
-        self.logger.info('stats received: %016x', ev.msg.datapath.id)
+        #self.logger.info('stats received: %016x', ev.msg.datapath.id)
 
         for stat in sorted(body, key=attrgetter('port_no')):
             timestamp = int(datetime.datetime.now().timestamp() * 1000000000)
@@ -81,7 +81,7 @@ class SimpleMonitor13(simple_switch_13.SimpleSwitch13):
                              stat.rx_packets, stat.rx_bytes, stat.rx_errors,
                              stat.tx_packets, stat.tx_bytes, stat.tx_errors,
                              timestamp)
-            self.logger.info(msg)
+            #self.logger.info(msg)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(msg.encode(), (UDP_IP, UDP_PORT))
                              

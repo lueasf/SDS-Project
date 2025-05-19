@@ -1,0 +1,14 @@
+
+DDOS :
+sh deploy.sh
+mininet> pingall
+mininet> attacker ping -f 10.0.0.1
+mininet> h1 ping -c 3 10.0.0.2
+mininet> attacker ping -f 10.0.0.1
+
+
+PORT SCANNING
+sh deploy.sh
+mininet> attacker nmap -p 80 10.0.0.1
+mininet> sh ovs-ofctl add-flow s1 "priority=200,ip,nw_src=10.0.0.3,action=drop"
+mininet> attacker nmap -p 60-80 10.0.0.1

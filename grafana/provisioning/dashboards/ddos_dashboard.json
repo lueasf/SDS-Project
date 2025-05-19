@@ -1,0 +1,28 @@
+{
+    "id": null,
+    "title": "DDoS Monitor",
+    "timezone": "browser",
+    "panels": [
+      {
+        "type": "timeseries",
+        "title": "RX Packets per Port",
+        "datasource": "InfluxDB",
+        "targets": [
+          {
+            "query": "SELECT mean(\"rx-pkts\") FROM \"ports\" WHERE $timeFilter GROUP BY time($__interval), \"port\" fill(null)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ],
+    "schemaVersion": 36,
+    "version": 1,
+    "refresh": "5s"
+  }
+  

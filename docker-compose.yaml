@@ -5,6 +5,7 @@ services:
     image: influxdb:1.8
     ports:
       - "8086:8086"
+    command: /bin/bash -c "influxd & sleep 5 && influx -execute 'CREATE DATABASE RYU' && tail -f /dev/null"
 
   telegraf:
     image: telegraf

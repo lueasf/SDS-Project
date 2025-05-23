@@ -1,9 +1,10 @@
 # SDS-Project
 
 
-##
+## Demo
+The demo commands are in the commands.txt file
 
-## Requirements
+## Project Requirements
 
 1) The project NEED TO include:
 
